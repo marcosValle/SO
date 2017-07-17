@@ -1,11 +1,23 @@
 #!/bin/bash
 
-function banner {
+function checkDependencies {
     if [[ $(dpkg -s figlet 1>/dev/null) -eq 1 ]]
     then
-        apt install figlet
+        sudo apt install figlet
     fi
+    
+    if [[ $(dpkg -s convert 1>/dev/null) -eq 1 ]]
+    then
+        sudo apt install convert
+    fi
+      
+    if [[ $(dpkg -s gnuplot 1>/dev/null) -eq 1 ]]
+    then
+        sudo apt install gnuplot
+    fi
+}
 
+function banner {
     echo LAB 1 | figlet
 }
 
@@ -49,7 +61,8 @@ then
     exit
 fi
 
-banner 
+banner
+checkDependencies
 >grafico.csv
 
 listCmd=("$@")

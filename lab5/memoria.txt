@@ -1,0 +1,74 @@
+#!/bin/bash
+
+#Processador: Intel(R) Core(TM) i7-4510U CPU @ 2.00GHz
+
+#O programa gera iterativamente o código dos programas cache1.c e cache2.c com os tamanhos pedidos, compara os tempos, formata os resultados e imprime em um arquivo que é manualmente aberto no libreoffice para gerar os gráficos.
+#
+#OUTPUT:
+####4096###
+#real    0.063s  0.357s
+#user    0.060s  0.356s
+#sys     0.000s  0.000s
+####8192###
+#real    0.196s  1.266s
+#user    0.192s  1.256s
+#sys     0.004s  0.008s
+####16384###
+#real    0.757s  4.857s
+#user    0.736s  4.840s
+#sys     0.020s  0.016s
+####32768###
+#real    3.035s  19.837s
+#user    2.952s  19.752s
+#sys     0.080s  0.076s
+####65536###
+#real    12.826s 1m28.487s
+#user    11.796s 1m27.372s
+#sys     1.028s  1.100s
+
+function gen1 {
+	cat > cache1.c <<- EOF
+    unsigned char buffer[$1][$1];
+	int main (){
+	    int i, j;
+
+	    for(i=0; i<$1; i++){ // percorre as linhas do buffer
+		    for(j=0; j<$1; j++) // percorre as colunas do buffer
+		        buffer[i][j]= (i+j) % 256;
+        }
+	}
+EOF
+}
+
+function gen2 {
+    cat > cache2.c <<- EOF
+	unsigned char buffer[$1][$1];
+	int main (){
+	    int i, j;
+
+	    for(j=0; j<$1; j++){ // percorre as linhas do buffer
+		    for(i=0; i<$1; i++) // percorre as colunas do buffer
+		        buffer[i][j]= (i+j) % 256;
+	    }
+    }
+EOF
+}
+
+for size in 4096 8192 16384 32768 65536
+do
+    gen1 $size
+    gen2 $size
+
+	gcc -o cache1 cache1.c
+	gcc -o cache2 cache2.c
+
+    chmod +x cache1 
+    chmod +x cache2
+
+    printf "###$size###"
+    { time ./cache1 ; } 2> graf1$size
+    { time ./cache2 ; } 2>&1 | awk '{print $2}' > graf2$size
+    paste graf1$size graf2$size | sed -e 's/0m//g' | tee graf$size
+    sed -i '1s/^/\t1\t2/' graf$size
+    rm graf1$size graf2$size
+done

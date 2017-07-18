@@ -43,9 +43,16 @@ function procura {
 }
 
 function busca {
-	
+#    egrep '8[0-9]{1,2}\.([0-9]{1,3}\.){2}[0-9]{1,3}' log_apache #| egrep -o 'almhuette_raith_0*[4-7]\.(png|jpg)' log_apache
+    egrep -o '^8[0-9]{1,2}\.([0-9]{1,3}\.){2}[0-9]{1,3}.*almhuette_raith_0*[4-7]\.(png|jpg)' log_apache | cut -d'/' -f7
+}
+
+function mudar {
+    sed -n '22,25p' log_apache | sed -e 's/1/2/' -e 's/Windows/Linux/g' -e '1d'
 }
 
 #filtra_ip
 #faz_whois country
-procura
+#procura
+#busca
+mudar

@@ -1,26 +1,5 @@
 #!/bin/bash
 
-function checkDependencies {
-    if [[ $(dpkg -s figlet 1>/dev/null) -eq 1 ]]
-    then
-        sudo apt install figlet
-    fi
-    
-    if [[ $(dpkg -s convert 1>/dev/null) -eq 1 ]]
-    then
-        sudo apt install convert
-    fi
-      
-    if [[ $(dpkg -s gnuplot 1>/dev/null) -eq 1 ]]
-    then
-        sudo apt install gnuplot
-    fi
-}
-
-function banner {
-    echo LAB 1 | figlet
-}
-
 function formatResult {
     if [[ -z $1 ]]
     then
@@ -51,7 +30,6 @@ function plotCsv {
 EOR
 
 convert grafico.png grafico.pdf
-rm grafico.png
 }
 
 if [[ $# -eq 0 ]]
@@ -61,8 +39,6 @@ then
     exit
 fi
 
-banner
-checkDependencies
 >grafico.csv
 
 listCmd=("$@")
@@ -81,3 +57,4 @@ do
 done
     plotCsv
     rm grafico.csv
+    rm grafico.png
